@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title>dynamite</title>
+    <link rel="stylesheet" href="assets/css/style.css">
+</head>
+
+<body>
+    <p>Score: <span id="score">0</span></p>
+    <p>Health: <span id="health">9</span></p>
+    <p>Level: <span id="level">1</span></p>
+
+    <!-- Sound Toggle Button -->
+    <button id="soundToggleButton">Sound: ON</button>
+
+    <!-- Hidden Audio Element -->
+    <audio id="gameSound" src="assets/audio/cartoon-sound-effects-bong4.wav" preload="none"></audio>
+    <div class="grid" id="grid">
+        <div class="holes" id="hole1"></div>
+        <div class="holes" id="hole2"></div>
+        <div class="holes" id="hole3"></div>
+        <div class="holes" id="hole4"></div>
+        <div class="holes" id="hole5"></div>
+        <div class="holes" id="hole6"></div>
+        <div class="holes" id="hole7"></div>
+        <div class="holes" id="hole8"></div>
+        <div class="holes" id="hole9"></div>
+    </div>
+    <button id="startButton">Start button</button>
+    <button id="resartBtn" style="display: none;">Restart button</button>
+    <div id="gameOverScreen" style="display:none;">Game Over</div>
+    <div id="WinnerScreen" style="display:none;"></div>
+
+    <script>
+        const soundToggleButton = document.getElementById("soundToggleButton");
+        const gameSound = document.getElementById("gameSound"); // Get the audio element
+        let soundOn = true; // Initial state of sound
+        const holes = document.getElementsByClassName("holes");
+        const stBtn = document.getElementById("startButton");
+        const score = document.getElementById("score");
+        const health = document.getElementById("health");
+        const level = document.getElementById("level");
+        const restBtn = document.getElementById("resartBtn");
+        const winnerScreen = document.getElementById("WinnerScreen");
+        const soundBtn = document.getElementById("soundButton");
+        const grid = document.getElementById("grid"); // Get the grid element
+        let max_health = 9;
+        let disScore = 0;
+        let dishealth = max_health;
+        let dislevel = "";
+        let no_of_level = ["Slow", "Medium", "Fast"];
+        level.textContent = no_of_level[0];
+        let gameInterval;
+        let interval_speed = 3000;
+        let displayTime = 2500;
+        let displayTimeout;
+
+        function toggleSound() {
+            soundOn = !soundOn; // Toggle the sound state
+            soundToggleButton.textContent = soundOn ? "Sound: ON" : "Sound: OFF"; // Update button text
+            // Play or pause the sound based on the toggle state
+            if (soundOn) {
+                gameSound.play();
+            } else {
+                gameSound.pause();
+            }
+        }
+
+
+        // Add event listener for the button to toggle sound
+        soundToggleButton.addEventListener("click", toggleSound);
+
+        // Example usage: play sound only if sound is enabled
+        function playSoundEffect() {
+            if (soundOn) {
+                gameSound.currentTime = 0; // Reset to the start for each play
+                gameSound.play();
+            }
+        }
+        gameSound.onerror = function () {
+            console.error("Audio file failed to load.");
+            // Optionally provide a fallback sound or disable the sound toggle button
+            soundToggleButton.disabled = true;
+        };
+
+        // Flags to track if the level screen has been shown
+        let level1Shown = false;
+        let level2Shown = false;
+        let level3Shown = false;
+
+        // Add event listener to the start button
+        stBtn.addEventListener("click", function () {
+            gameInterval = setInterval(startGame, interval_speed);
+        });
+
+        function startGame() {
+
+            stBtn.style.display = "none";
+            restBtn.style.display = "inline-block";
+
+            // Clear all holes before starting the next iteration
+            clearHoles();
+
+            // Show level screen only once at specific scores
+            if (disScore === 0 && !level1Shown) {
+                showLevelScreen(no_of_level[0], function () {
+                    level1Shown = true;
+                    displayImages();
+                });
+            } else if (disScore === 10 && !level2Shown) {
+                showLevelScreen(no_of_level[1], function () {
+                    level2Shown = true;
+                    displayImages();
+                });
+            } else if (disScore === 20 && !level3Shown) {
+                showLevelScreen(no_of_level[2], function () {
+                    level3Shown = true;
+                    displayImages();
+                });
+            } else {
+                displayImages();
+            }
+        }
+
+        function showLevelScreen(levelText, callback) {
+            winnerScreen.textContent = "Level:" + levelText;
+            winnerScreen.style.display = "flex";
+            setTimeout(function () {
+                winnerScreen.style.display = "none";
+                callback(); // Resume the game
+            }, 1500);
+        }
+
+        function clearHoles() {
+            for (let i = 0; i < holes.length; i++) {
+                holes[i].innerHTML = '';
+            }
+        }
+
+        function displayImages() {
+            clearTimeout(displayTimeout)
+            try {
+                let generator1 = Math.floor(Math.random() * 9) + 1;
+                let generator2;
+                do {
+                    generator2 = Math.floor(Math.random() * 9) + 1;
+                } while (generator2 === generator1);
+
+                // Place the first image
+                const hole_selector1 = document.getElementById(`hole${generator1}`);
+                if (!hole_selector1) {
+                    throw new Error(`Hole with ID 'hole${generator1}' not found.`);
+                }
+
+                else {
+                    const img1 = document.createElement("img");
+                    img1.src = "assets/images/cute-dog.jpg";
+                    img1.alt = "Dog image";
+                    img1.style.width = "100px";
+                    img1.style.height = "100px";
+                    img1.style.borderRadius = "50%";
+
+                    // Attach the whackDog function to the click event
+                    img1.addEventListener("click", whackDog);
+
+                    hole_selector1.appendChild(img1);
+                    displayTimeout = setTimeout(function () {
+                        hole_selector1.innerHTML = '';
+                    }, displayTime);
+                }
+
+                // Place the second image
+                const hole_selector2 = document.getElementById(`hole${generator2}`);
+                if (!hole_selector2) {
+                    throw new Error(`Hole with ID 'hole${generator2}' not found.`);
+                }
+                else {
+                    const img2 = document.createElement("img");
+                    img2.src = "assets/images/cute-cat.jpg";
+                    img2.alt = "Cat image";
+                    img2.style.width = "100px";
+                    img2.style.height = "100px";
+                    img2.style.borderRadius = "50%";
+
+                    // Attach the whackCat function to the click event
+                    img2.addEventListener("click", whackCat);
+
+                    hole_selector2.appendChild(img2);
+                    displayTimeout = setTimeout(function () {
+                        hole_selector2.innerHTML = '';
+                    }, displayTime);
+                }
+
+            } catch (error) {
+                alert(error)
+            }
+
+        }
+
+        // Function to handle the click event when the cat image is clicked
+        function whackCat() {
+            incrementScore();
+            playSoundEffect();
+
+        }
+
+        // Function to handle the click event when the dog image is clicked
+        function whackDog() {
+            weakeningHealth();
+            playSoundEffect();
+        }
+
+        function incrementScore() {
+            disScore++;
+            score.textContent = disScore;
+
+            if (disScore <= 10) {
+                dislevel = no_of_level[0];
+                level.textContent = dislevel;
+                interval_speed = 3000;
+                displayTime = 2500;
+            } else if (disScore > 10 && disScore <= 20) {
+                dislevel = no_of_level[1];
+                level.textContent = dislevel;
+                interval_speed = 2000;
+                displayTime = 1500;
+            } else if (disScore > 20 && disScore <= 30) {
+                dislevel = no_of_level[2];
+                level.textContent = dislevel;
+                interval_speed = 1000;
+                displayTime = 800;
+            } else {
+                showWinnercreen();
+                clearInterval(gameInterval);
+                clearTimeout(displayTimeout);
+                endGame();
+                return;
+            }
+
+            // Reset the interval to match the current level speed
+            clearInterval(gameInterval);
+            gameInterval = setInterval(startGame, interval_speed);
+        }
+
+        function weakeningHealth() {
+            playSoundEffect();
+            dishealth--;
+            if (dishealth >= 1 && dishealth <= 9) {
+                health.textContent = dishealth;
+            } else {
+                clearInterval(gameInterval);
+                clearTimeout(displayTimeout);
+                displayGameOver();
+                endGame();
+            }
+        }
+
+        function displayGameOver() {
+            const gameOverScreen = document.getElementById("gameOverScreen");
+            gameOverScreen.style.display = "flex";
+            setTimeout(function () {
+                gameOverScreen.style.display = "none";
+            }, 2000);
+        }
+
+        function endGame() {
+            clearHoles();
+            clearInterval(gameInterval);
+            clearTimeout(displayTimeout);
+            resartGame();
+        }
+
+        function showWinnercreen() {
+            winnerScreen.textContent = "You Won";
+            winnerScreen.style.display = "flex";
+            setTimeout(function () {
+                winnerScreen.style.display = "none";
+            }, 2000);
+        }
+
+        function resartGame() {
+            stBtn.style.display = "inline-block";
+            restBtn.style.display = "none";
+            level.textContent = no_of_level[0];
+            dishealth = max_health
+            health.textContent = dishealth;
+            disScore = 0;
+            score.textContent = disScore;
+            clearInterval(gameInterval);
+            clearTimeout(displayTimeout);
+            interval_speed = 3000;
+            displayTime = 2500;
+            // Reset level screen flags
+            level1Shown = false;
+            level2Shown = false;
+            level3Shown = false;
+        }
+    </script>
+</body>
+
+</html>
