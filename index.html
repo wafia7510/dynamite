@@ -93,6 +93,7 @@
         stBtn.addEventListener("click", function () {
             gameInterval = setInterval(startGame, interval_speed);
         });
+        restBtn.addEventListener("click",resartGame);
 
         function startGame() {
 
@@ -157,13 +158,11 @@
                     const img1 = document.createElement("img");
                     img1.src = "assets/images/cute-dog.jpg";
                     img1.alt = "Dog image";
-                    img1.style.width = "100px";
-                    img1.style.height = "100px";
-                    img1.style.borderRadius = "50%";
+                    img1.classList.add("dog");
 
                     // Attach the whackDog function to the click event
                     img1.addEventListener("click", whackDog);
-
+                    
                     hole_selector1.appendChild(img1);
                     displayTimeout = setTimeout(function () {
                         hole_selector1.innerHTML = '';
@@ -179,13 +178,10 @@
                     const img2 = document.createElement("img");
                     img2.src = "assets/images/cute-cat.jpg";
                     img2.alt = "Cat image";
-                    img2.style.width = "100px";
-                    img2.style.height = "100px";
-                    img2.style.borderRadius = "50%";
-
+                    img2.classList.add("cat");
                     // Attach the whackCat function to the click event
                     img2.addEventListener("click", whackCat);
-
+                    
                     hole_selector2.appendChild(img2);
                     displayTimeout = setTimeout(function () {
                         hole_selector2.innerHTML = '';
@@ -200,6 +196,8 @@
 
         // Function to handle the click event when the cat image is clicked
         function whackCat() {
+            let cat=document.querySelector(".cat");
+            cat.classList.add("disable");
             incrementScore();
             playSoundEffect();
 
@@ -207,6 +205,8 @@
 
         // Function to handle the click event when the dog image is clicked
         function whackDog() {
+            let dog=document.querySelector(".dog"); 
+            dog.classList.add("disable");
             weakeningHealth();
             playSoundEffect();
         }
@@ -280,21 +280,22 @@
         }
 
         function resartGame() {
-            stBtn.style.display = "inline-block";
-            restBtn.style.display = "none";
-            level.textContent = no_of_level[0];
-            dishealth = max_health
-            health.textContent = dishealth;
-            disScore = 0;
-            score.textContent = disScore;
-            clearInterval(gameInterval);
-            clearTimeout(displayTimeout);
-            interval_speed = 3000;
-            displayTime = 2500;
-            // Reset level screen flags
-            level1Shown = false;
-            level2Shown = false;
-            level3Shown = false;
+            // stBtn.style.display = "inline-block";
+            // restBtn.style.display = "none";
+            // level.textContent = no_of_level[0];
+            // dishealth = max_health
+            // health.textContent = dishealth;
+            // disScore = 0;
+            // score.textContent = disScore;
+            // clearInterval(gameInterval);
+            // clearTimeout(displayTimeout);
+            // interval_speed = 3000;
+            // displayTime = 2500;
+            // // Reset level screen flags
+            // level1Shown = false;
+            // level2Shown = false;
+            // level3Shown = false;
+            window.location.reload();
         }
     </script>
 </body>
